@@ -1,2 +1,2 @@
 # EmotionPredictor
-This git repo will be updated very soon with Robin Szymczak thesis on emotion prediction.
+This git repo will be updated before the 5th of october with the EmotionPredictor code.
