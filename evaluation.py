@@ -8,20 +8,28 @@ import sklearn
 from sklearn.metrics import confusion_matrix 
 import copy
 
-print("imported")
-def get_empty_reports():
-    return { "labels": None, "results": None}
 
 class Report(dict):
-    def __init__(self, results = None, labels = None, class_labels = "infer", threshold = 0):
+    def __init__(self, results = None, labels = None, class_labels = "infer", threshold = None):
         self.results = results
         self.labels = labels
         self.threshold = threshold
         self.class_labels = class_labels
         for key, value in self.__dict__.items():
-            self[key] = value
+            self[key] = value   
         
+    def __setitem__(self, key, value):
+        self.__dict__[key] = value
         
+    def __getitem__(self, key):
+        return self.__dict__[key]  
+        
+    def __str__(self):
+        return f"Report object, threshold set at {self.threshold} "
+    
+    def __repr__(self):
+        return f"Report object, threshold set at {self.threshold} "
+    
     def metrics(self):
         assert self.results is not None, "No results to evaluate."
         assert self.labels is not None, "No labels to evaluate."
@@ -31,26 +39,28 @@ class Report(dict):
     def overall_metrics(self):
         return get_overall_metrics(self.metrics(), self.threshold)
         
-    def show_results(self, normalize_confusion = False):
+    def show_results(self, normalize_confusion=False):
         show_results(self.metrics(), normalize_confusion, self.threshold)
     
-    def save_metrics(self, path, figures = False):
+    def save_metrics(self, path, figures=False):
         metrics = self.metrics() if metrics is None else metrics 
         save_metrics(metrics, path, figures = figures)
          
-    def save_labels_results(self, path, labels_name = "labels.npy", results_name = "results.npy"):
+    def save_labels_results(self,
+                            path,
+                            labels_name="labels.npy",
+                            results_name="results.npy"):
+        assert self.results is not None, "No results to save."
+        assert self.labels is not None, "No labels to save."
         np.save(osp.join(path, results_name), self.results)
         np.save(osp.join(path, labels_name), self.labels)
     
-    def load_labels_results(self, path,labels_name = "labels.npy", results_name = "results.npy"):
+    def load_labels_results(self,
+                            path,labels_name = "labels.npy",
+                            results_name = "results.npy"):
         self.results = np.load(osp.join(path, results_name))
         self.labels = np.load(osp.join(path, labels_name))
-    
-    def __str__(self):
-        return f"Report object, threshold set at {self.threshold} "
-    
-    def __repr__(self):
-        return f"Report object, threshold set at {self.threshold} "
+
         
 
 
@@ -65,6 +75,7 @@ def get_overall_metrics(metrics, threshold = 0.5, dec = 3):
     return df
 
 def save_metrics(metrics, path, figures = False):
+    "Save the metrics at location path, the confusion matrices are plotted and saved if figures is set to True."
     save_latek(osp.join(path, "prfs_per_class.tex"),
                df_prfs(metrics).to_latex())
 
@@ -81,7 +92,6 @@ def save_metrics(metrics, path, figures = False):
         plot_confusion_matrix(mat);
         save_fig(osp.join(path, "confusion.pdf"))
     
-
 def save_latek(path, latek):
     assert path[-4:] == ".tex", "your filename should have the extension .tex"
     with open(path, "w+") as f:
@@ -110,8 +120,11 @@ def df_prfs(metrics):
                   index =["precision","recall","f1_score", "support"]).round(2)
 
 def compute_metrics_for_threshold(results, labels, agreement_threshold, confusion_labels):
+    """Returns a dictionary containing the confusion_matrix,
+    the precision_reacall_fscore_support for every class labels, and the macro score for the recall,
+    f1_score, and accuracy.
+    """
     labels_thresholded = threshold_array(labels, agreement_threshold)
-
     labels_argmax = np.argmax(labels[labels_thresholded], 1)
     results_argmax = np.argmax(results[labels_thresholded], 1)
     
@@ -121,9 +134,19 @@ def compute_metrics_for_threshold(results, labels, agreement_threshold, confusio
     metrics_at_threshold = {              
               "agreement_threshold": agreement_threshold,
               "confusion_matrix" : confusion_matrix,
-                "precision_recall_fscore_support" : sklearn.metrics.precision_recall_fscore_support(labels_argmax, results_argmax, labels = range(len(confusion_labels)), zero_division = 0),
-               "recall" : sklearn.metrics.recall_score(labels_argmax, results_argmax, average="macro", zero_division = 0),
-                "f1_score" :  sklearn.metrics.f1_score(labels_argmax, results_argmax, average="macro", zero_division = 0),
+                "precision_recall_fscore_support" :
+        sklearn.metrics.precision_recall_fscore_support(labels_argmax,
+                                                        results_argmax,
+                                                        labels = range(len(confusion_labels)),
+                                                        zero_division = 0),
+               "recall" : sklearn.metrics.recall_score(labels_argmax,
+                                                       results_argmax,
+                                                       average="macro",
+                                                       zero_division = 0),
+                "f1_score" :  sklearn.metrics.f1_score(labels_argmax,
+                                                       results_argmax,
+                                                       average="macro",
+                                                       zero_division = 0),
                 "accuracy" : accuracy
     }
     
@@ -160,11 +183,14 @@ def normalize_matrix(matrix, axis = 0, dec = 2):
     matrix = matrix.fillna(0)
     return matrix
 
-
 def threshold_array(array, threshold, strict = True):
     """
     return : The boolean sequence where the max of the array is above a threshold
     """
+    if threshold == 0:
+        return np.ones_like(array).astype(bool)
+    if threshold is None:
+        return np.ones_like(array).astype(bool)
     if strict: 
         threshold = 0.999 if threshold == 1 else threshold
         return array.max(1) > threshold

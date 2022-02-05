@@ -1,5 +1,3 @@
-import torch 
-import torch.nn as nn
 import clip
 import seaborn as sns
 import os
@@ -7,10 +5,10 @@ import pickle
 import sklearn
 from tqdm import tqdm
 import seaborn as sns
-import custom as ct
 import numpy as np
 import matplotlib.pyplot as plt
 from artemis.emotions import ARTEMIS_EMOTIONS
+
 
 
 def emotion_colors(palette = sns.palettes.color_palette("colorblind")):

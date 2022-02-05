@@ -1,19 +1,22 @@
-import torch
 import os
-import pandas as pd
 import os.path as osp
-from artemis.in_out.datasets import ImageClassificationDataset
 import argparse
 import pickle
 from ast import literal_eval
 import ast
 from tqdm import tqdm
+
+import pandas as pd
 import numpy as np
+import torch
+
+from artemis.in_out.datasets import ImageClassificationDataset
+
 
 global device 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-def create_dataset(model, data_loader, save_path, recreate = False):
+def create_dataset(model, data_loader, save_path, recreate=False):
     """
     Save the feature vectors optained by passing them in the model at the save_path location.
     If recreate is set to True the existing folder is overwritten.
@@ -39,7 +42,7 @@ def create_dataset(model, data_loader, save_path, recreate = False):
         
 class Pickle_data_loader :
     
-    def __init__(self, path, transformations = None ):
+    def __init__(self, path, transformations=None):
         self.path = path
         self.transformations = transformations if transformations is not None else []
         
@@ -151,5 +154,5 @@ def modified_image_emotion_distribution_df_to_pytorch_dataset(df, args, preproce
                                                          num_workers=n_workers)
     return dataloaders, datasets
 
-def get_loaders(path, transformations):
+def get_loaders(path, transformations=None):
     return dict([[subset, Pickle_data_loader(osp.join(path, subset), transformations)] for subset in os.listdir(path)])

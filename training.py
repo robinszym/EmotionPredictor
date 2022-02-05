@@ -9,7 +9,6 @@ from IPython.display import clear_output
 from tqdm.notebook import tqdm as tqdm_notebook
 import seaborn as sns
 import evaluation
-from evaluation import Report
 from IPython.display import display
 import plotly.express as px
 import copy
@@ -19,6 +18,9 @@ import pickle
 import random
 from IPython.display import clear_output
 
+from .evaluation import Report
+
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def set_device(new_device):
@@ -26,6 +28,19 @@ def set_device(new_device):
     global device 
     device = new_device
     return 
+
+
+class SLP(nn.Module):
+    def __init__(self,input_size = 512, output_size = 9):
+        super().__init__()
+        self.layers = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(input_size, output_size)
+        )
+        
+    def forward(self, x):
+        fp = self.layers(x.float())
+        return fp
     
 class Trainer(Report) :
     def __init__(self, model, loss_fn, optimizer_fn, lr, data_loaders, device = device):
@@ -90,7 +105,7 @@ class Trainer(Report) :
         """
         Compute the loss on a subset, default "val".
         """
-        loader = self.data_loaders["val"] if loader == None else loader
+        loader = self.data_loaders["val"] if loader is None else loader
         epoch_loss = 0
         for data in loader:
             inputs = data["image"].to(device)
@@ -116,7 +131,7 @@ class Trainer(Report) :
         return
     
     def train_n_epochs(self, n, device = device):
-        train_n_epochs(self.model,
+        self.epoch_losses += train_n_epochs(self.model,
                        self.loss_fn,
                        self.optimizer,
                        n,
@@ -133,7 +148,7 @@ class Trainer(Report) :
         self.class_labels = confusion_labels
         self.threshold = agreement_threshold
         
-        if (self.results == None) or (self.labels == None): 
+        if (self.results is None) or (self.labels is None): 
             self.results, self.labels = results_labels_for_subset(self.model,
                                                              self.data_loaders,
                                                              "test",
@@ -142,7 +157,8 @@ class Trainer(Report) :
             self.labels = self.labels.numpy()
         
         self.threshold = agreement_threshold
-        self.show_results()
+        if show_fig :
+            self.show_results()
     
     def save_model(self, path):
         torch.save(self.model.state_dict(), path)
