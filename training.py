@@ -115,7 +115,7 @@ class Trainer(Report) :
             epoch_loss += loss.item()
         return epoch_loss
     
-    def train_eval(self, epochs_per_lr, lrs, run_check = False):
+    def train_eval(self, epochs_per_lr, lrs):
         for lr in lrs:
             for epoch in range(epochs_per_lr):
                 self.lr = lr
