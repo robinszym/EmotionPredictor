@@ -8,7 +8,6 @@ import sklearn
 from sklearn.metrics import confusion_matrix 
 import copy
 
-
 class Report(dict):
     def __init__(self, results = None, labels = None, class_labels = "infer", threshold = None):
         self.results = results
@@ -97,14 +96,6 @@ def save_latek(path, latek):
     with open(path, "w+") as f:
         f.write(latek)
         
-def metrics(reports):
-    last_epoch_reports = get_last_results(reports)
-    metrics_at05 = list(last_epoch_reports["metrics_at_threshold"].values())[-1]
-    return metrics_at05
-
-def get_last_results(reports):
-    return list(reports["results_at_epoch"].values())[-1]
-
 def show_results(metrics, normalize_confusion = False, threshold = None):
     print(f"showing results with agreements of {threshold*100}%")
     plot_confusion_matrix(metrics["confusion_matrix"], normalize_confusion)

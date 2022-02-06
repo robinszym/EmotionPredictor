@@ -1,13 +1,24 @@
-import clip
-import seaborn as sns
 import os
 import pickle
-import sklearn
-from tqdm import tqdm
+
 import seaborn as sns
+import sklearn
 import numpy as np
 import matplotlib.pyplot as plt
-from artemis.emotions import ARTEMIS_EMOTIONS
+import clip
+
+from tqdm import tqdm
+
+
+ARTEMIS_EMOTIONS = ['amusement',
+ 'awe',
+ 'contentment',
+ 'excitement',
+ 'anger',
+ 'disgust',
+ 'fear',
+ 'sadness',
+ 'something else']
 
 
 def emotion_colors(palette = sns.palettes.color_palette("colorblind")):

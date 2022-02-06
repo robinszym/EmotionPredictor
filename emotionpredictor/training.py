@@ -1,23 +1,24 @@
-import numpy as np
-import torch
-import pandas as pd
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
-from torch import nn
-import sklearn
-from IPython.display import clear_output
-from tqdm.notebook import tqdm as tqdm_notebook
-import seaborn as sns
-import evaluation
+import random
 from IPython.display import display
-import plotly.express as px
+import pickle
 import copy
 import os
 import sys
-import pickle
-import random
+
+import pandas as pd
+import numpy as np
+import torch
+import torch.nn as nn
+import sklearn
+import seaborn as sns
+import plotly.express as px
+import matplotlib.pyplot as plt
+from IPython.display import clear_output
+from sklearn.metrics import confusion_matrix
+from tqdm.notebook import tqdm as tqdm_notebook
 from IPython.display import clear_output
 
+from . import evaluation
 from .evaluation import Report
 
 
@@ -79,8 +80,7 @@ class Trainer(Report) :
         return self.model(*args)
         
     def set_optimizer(self):
-        self.optimizer = self.optimizer_fn(self.model.parameters(), lr=self.lr)
-        
+        self.optimizer = self.optimizer_fn(self.model.parameters(), lr=self.lr)    
     
     def test_network(self, test_epochs = 50, target_loss = 0.5):
         """
@@ -138,9 +138,6 @@ class Trainer(Report) :
                        self.data_loaders["train"],
                        device)
   
-
-
-    
     def create_report(self, confusion_labels, normalize_confusion = False, show_fig = True, agreement_threshold = 0.5):
         """
         Set the parameters for the metrics.
@@ -162,9 +159,8 @@ class Trainer(Report) :
     
     def save_model(self, path):
         torch.save(self.model.state_dict(), path)
+        return
        
-                
-
 
 #Transformations for the pickle data_loader
 def trim(trim_size):
@@ -191,7 +187,6 @@ def results_labels_for_subset(model, data_loaders, subset, device):
         results = torch.cat([results, logits])
         all_labels = torch.cat([all_labels, labels])
     return results, all_labels
-
 
 def train_n_epochs(model, loss_fn, optimizer, epochs, loader, device):
     model = model.train().to(device)
