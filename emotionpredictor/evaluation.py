@@ -57,8 +57,8 @@ class Report(dict):
     def load_labels_results(self,
                             path,labels_name = "labels.npy",
                             results_name = "results.npy"):
-        self.results = np.load(osp.join(path, results_name))
-        self.labels = np.load(osp.join(path, labels_name))
+        self.results = np.load(osp.join(path, results_name), allow_pickle=True)
+        self.labels = np.load(osp.join(path, labels_name), allow_pickle=True)
 
         
 
