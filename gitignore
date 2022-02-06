@@ -2,3 +2,4 @@ emotionpredictor.egg-info
 dist
 build
 gitignore
+__pycache__
