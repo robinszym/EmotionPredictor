@@ -18,7 +18,6 @@ def get_original_wikiart_dataloaders(path_emotion_histogram_csv, artemis_preproc
     Code extracted from the notebook found in the Artemis repo :
         https://github.com/optas/artemis/blob/master/artemis/notebooks/deep_nets/emotions/image_to_emotion_classifier.ipynb
     """
-    print("debug")
     image_hists = pd.read_csv(path_emotion_histogram_csv)
     image_hists.emotion_histogram = image_hists.emotion_histogram.map(ast.literal_eval)
     image_hists.emotion_histogram = image_hists.emotion_histogram.apply(lambda x: (np.array(x) / float(sum(x))).astype('float32'))
@@ -46,8 +45,8 @@ def get_original_wikiart_dataloaders(path_emotion_histogram_csv, artemis_preproc
 
     args.img_dir = wikiart_path
     
-    dataloaders, _ = modified_image_emotion_distribution_df_to_pytorch_dataset(df = artemis_data,args = args, preprocess=preprocess)
-    return dataloaders
+    dataloaders, datasets = modified_image_emotion_distribution_df_to_pytorch_dataset(df = artemis_data,args = args, preprocess=preprocess)
+    return dataloaders, datasets
 
 # Reimplementation of the image_emotion_distribution_df_to_pytorch_dataset to accept a preprocess argument on
 # the image transform. 

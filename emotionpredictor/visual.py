@@ -54,3 +54,9 @@ def normalize(tensor):
     c = tensor-tensor.min()
     c /= c.max()
     return c
+
+def web_img_wikiart():
+    wiki_art_web ="https://uploads4.wikiart.org/images/"
+    url = osp.join(wiki_art_web, string.replace("_", "/") ) + ".jpg!Large.jpg"
+    im = requests.get(url)
+    Image.open(BytesIO(im.content))
