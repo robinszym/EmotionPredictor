@@ -41,9 +41,7 @@ def show_torch_image(torch_image, axis = None):
     return
         
 def tensor2img(tensor):
-    tensor = tensor.detach().cpu()
-    c = tensor-tensor.min()
-    c /= c.max()
+    c = normalize(tensor)
     return c.permute(1,2,0)
 
 def save_fig(path):
@@ -51,3 +49,8 @@ def save_fig(path):
     a.savefig(path, bbox_inches = "tight")
     return
 
+def normalize(tensor):
+    tensor = tensor.detach().cpu()
+    c = tensor-tensor.min()
+    c /= c.max()
+    return c

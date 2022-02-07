@@ -1,5 +1,12 @@
+import argparse
+import ast
+import os.path as osp
+
+import torch
+import pandas as pd
+import numpy as np
+
 from artemis.in_out.datasets import ImageClassificationDataset
- 
 
 
 def max_io_workers():
@@ -11,6 +18,7 @@ def get_original_wikiart_dataloaders(path_emotion_histogram_csv, artemis_preproc
     Code extracted from the notebook found in the Artemis repo :
         https://github.com/optas/artemis/blob/master/artemis/notebooks/deep_nets/emotions/image_to_emotion_classifier.ipynb
     """
+    print("debug")
     image_hists = pd.read_csv(path_emotion_histogram_csv)
     image_hists.emotion_histogram = image_hists.emotion_histogram.map(ast.literal_eval)
     image_hists.emotion_histogram = image_hists.emotion_histogram.apply(lambda x: (np.array(x) / float(sum(x))).astype('float32'))
