@@ -23,7 +23,7 @@ Interface for images.
 </p>
 
 To create the demo simply run 
-````
+```
 $python emotionpredictor/demo_images.py
 ```
 # Affective search
