@@ -5,9 +5,9 @@ The EmotionPredictor predicts the emotion distribution of images. It uses CLIP a
 # Install
 
 ```
-$git clone https://github.com/robinszym/EmotionPredictor.git
-$cd EmotionPredictor
-$pip install -e .
+git clone https://github.com/robinszym/EmotionPredictor.git
+cd EmotionPredictor
+pip install -e .
 ```
 # Image affect prediction
 The model predicts the emotion distribution of images.
@@ -24,7 +24,7 @@ Interface for images.
 
 To create the demo simply run 
 ```
-$python emotionpredictor/demo_images.py
+python emotionpredictor/demo_images.py
 ```
 # Affective search
 It is possible to perform affective search on images by imputing a text prompt and filtering with an emotion.
@@ -44,7 +44,7 @@ Since the model was trained with CLIP it is also possible to predict the affect 
 ## Demo
 
 ```
-$python emotionpredictor/demo_text.py
+python emotionpredictor/demo_text.py
 ```
 Then click the local link generated. It takes a few seconds to load the clip model.
 
