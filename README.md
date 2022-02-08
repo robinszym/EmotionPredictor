@@ -16,7 +16,7 @@ The model predicts the emotion distribution of images.
 ## Web image demo
 
 <p align = "center">
-![demo_image](https://github.com/robinszym/EmotionPredictor/blob/main/image_prediction.png?raw=true)
+    <img src = "https://github.com/robinszym/EmotionPredictor/blob/main/image_prediction.png?raw=true">
 </p>
 <p align = "center">
 Interface for images.
