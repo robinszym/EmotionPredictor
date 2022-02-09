@@ -22,7 +22,7 @@ def get_iterator(path, preprocess) :
             yield preprocess(Image.open(img_path)).unsqueeze(0)
     return iterator()
 
-clip_model, preprocess = clip.load("RN50x16")
+
 
 class SLP(nn.Module):
     def __init__(self,input_size = 512, output_size = 9):
@@ -40,6 +40,7 @@ MODEL_PATH = "../../code/C-RN50x16"
 emotion = SLP(768)
 emotion.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device('cpu')))
 
+
 ARTEMIS_EMOTIONS = ['amusement',
  'awe',
  'contentment',
@@ -52,35 +53,6 @@ ARTEMIS_EMOTIONS = ['amusement',
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-#imgs = list(os.listdir("../../code/artemis/data_sets/wikiart/Analytical_Cubism/"))
-#imgs = ["../../code/artemis/data_sets/wikiart/Analytical_Cubism/" + img for img in imgs]
-#app.layout = html.Div([
-#    html.H6("Change the value in the text box to see callbacks in action!"),
-#    html.Div([
-#        "Input: ",
-#        dcc.Input(id='my-input', value='initial value', type='text')
-#    ]),
-#    html.Br(),
-#    dcc.Graph(id='graph'),
-#    dcc.Graph(id='pix'),
-#    html.Img(id = "image", src = imgs[0])
-#])
-
-
-#@app.callback(
-#    [Output(component_id='graph', component_property='figure'),
-#    Output(component_id = "pix", component_property = "figure")],
-#    Input(component_id='my-input', component_property='value')
-#)
-#def update_output_div(input_value):
-#    
-#    fig_bars = px.bar_polar(r = torch.rand(9).numpy(), theta = ARTEMIS_EMOTIONS, title = input_value)
-#    fig_bars.update_layout(transition_duration=500)
-#    img = Image.open(imgs[random.randint(0,len(imgs))])
-#    img = np.array(img)
-#    pix = px.imshow(img)
-#    pix.update_layout(transition_duration=1000)
-#    return fig_bars, pix #, html.Img(src = img)
 
 def get_text_encoding(texts, text_encoder):
     text = clip.tokenize(texts).to(device)
@@ -92,7 +64,8 @@ def get_text_encoding(texts, text_encoder):
 
 
 app.layout = html.Div([
-    html.H6("Change the value in the text box to see callbacks in action!"),
+    html.H3("Emotion Predictor : Text"),
+    html.H6("Predict the emotion reaction of this sentence"),
     html.Div([
         "Input: ",
         dcc.Input(id='my-input', value='initial value', type='text')
@@ -115,6 +88,6 @@ def update_output_div(input_value):
     
     return fig_bars
 
-
+clip_model, preprocess = clip.load("RN50x16")
 if __name__ == '__main__':
-    app.run_server(debug=True, port = 8049)
+    app.run_server(debug=True, port = 8048)

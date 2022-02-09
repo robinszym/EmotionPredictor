@@ -1,3 +1,6 @@
+import os
+import random
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -6,25 +9,25 @@ import torch
 import torch.nn as nn
 import numpy as np
 import plotly.express as px
-import os
 import random 
 from PIL import Image
-import clip
 import torch
-from PIL import Image
 import requests
+import pandas as pd
 
-device = "cpu"
-def get_iterator(path, preprocess) :
-    def iterator():
-        for image in os.listdir(path):
-            if image[-4:] != ".jpg":
-                continue
-            img_path = osp.join(path,image)
-            yield preprocess(Image.open(img_path)).unsqueeze(0)
-    return iterator()
+import clip
 
 
+
+ARTEMIS_EMOTIONS = ['amusement',
+ 'awe',
+ 'contentment',
+ 'excitement',
+ 'anger',
+ 'disgust',
+ 'fear',
+ 'sadness',
+ 'something else']
 
 class SLP(nn.Module):
     def __init__(self,input_size = 512, output_size = 9):
@@ -41,16 +44,12 @@ class SLP(nn.Module):
 MODEL_PATH = "../../code/C-RN50x16"
 emotion = SLP(768)
 emotion.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device('cpu')))
+wiki_base_url = "https://uploads6.wikiart.org/images/"
 
-ARTEMIS_EMOTIONS = ['amusement',
- 'awe',
- 'contentment',
- 'excitement',
- 'anger',
- 'disgust',
- 'fear',
- 'sadness',
- 'something else']
+test_set = pd.read_csv("../index2painting")
+test_set = test_set["image_files"]
+random_paintings = test_set
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -81,7 +80,8 @@ app.layout = html.Div([
     html.Div([
         html.H6("Provide the url of an image :"),
         html.Div([
-            dcc.Input(id='my-input', value='https://uploads5.wikiart.org/images/tivadar-kosztka-csontvary/castellamare-di-stabia-1902.jpg', type='url')
+            dcc.Input(id='my-input', value='https://uploads5.wikiart.org/images/tivadar-kosztka-csontvary/castellamare-di-stabia-1902.jpg', type='url'),
+            html.Button('random', id='btn-random', n_clicks=0)
         ])
     ], style = {'textAlign' : 'center'}),
 ], style = {"background-color" : "#F5F6F7"})
@@ -89,10 +89,15 @@ app.layout = html.Div([
 @app.callback(
     [Output(component_id='img', component_property='figure'),
     Output(component_id='graph', component_property='figure')],
-    Input(component_id='my-input', component_property='value')
+    [Input(component_id='my-input', component_property='value'),
+    Input(component_id='btn-random', component_property='n_clicks')]
 )
-def update_output_div(input_value):
-    
+def update_output_div(input_value, n_clicks):
+    ctx = dash.callback_context
+    if ctx.triggered[0]["prop_id"] == "btn-random.n_clicks" :
+        painting = test_set[random.randint(0,len(test_set))]
+        input_value = wiki_base_url + painting.replace("_", "/") + ".jpg"
+        
     img = Image.open(requests.get(input_value, stream=True).raw)
     features = get_img_encoding(preprocess_img(img), clip_model.visual)
     fig_bars = px.bar_polar(r = emotion(features).softmax(1).tolist()[0], theta = ARTEMIS_EMOTIONS, color = ARTEMIS_EMOTIONS)
